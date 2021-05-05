@@ -2,3 +2,5 @@ objs
 slurminfo
 \#*
 .#*
+version.h
+version.txt

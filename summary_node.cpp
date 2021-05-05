@@ -94,11 +94,12 @@ void print_node_summary(FILE *file, job_info_msg_t *job_buffer_ptr,
           }
 
           fprintf(file,
-                  "  Node: %-8s  State: %s  Job: %2d  Mem: %sG/%sG/%sG  CPU: %u/%u  "
+                  "  Node: %-8s  State: %s  Job: %2d  Mem: %sG/%sG/%sG  CPU: "
+                  "%u/%u  "
                   "Load:%.2f",
-                  node_info->name, node_state_short(node_info->node_state), num_job,
-                  used_mem_str, alloc_mem_str, total_mem_str, alloc_cpu,
-                  node_tres.cpu, (node_info->cpu_load / 100.));
+                  node_info->name, node_state_short(node_info->node_state),
+                  num_job, used_mem_str, alloc_mem_str, total_mem_str,
+                  alloc_cpu, node_tres.cpu, (node_info->cpu_load / 100.));
           if (node_tres.gpu > 0) {
             fprintf(file, " GPU: %u/%u", alloc_gpu, node_tres.gpu);
           }

@@ -19,15 +19,17 @@
 #include "slurmd.h"
 #include "summary.h"
 #include "term.h"
+#include "version.h"
 
 int main(int argc, char **argv) {
   bool show_help = false;
+  bool show_version = false;
   bool detail_mode = false;
   const char *show_user = NULL;
   int exit_code = 0;
 
   int opt;
-  while ((opt = getopt(argc, argv, "h?du:")) != -1) {
+  while ((opt = getopt(argc, argv, "h?du:vV")) != -1) {
     switch (opt) {
     case 'h':
     case '?':
@@ -38,6 +40,10 @@ int main(int argc, char **argv) {
       break;
     case 'u':
       show_user = optarg;
+      break;
+    case 'v':
+    case 'V':
+      show_version = true;
       break;
     default:
       show_help = true;
@@ -63,6 +69,7 @@ int main(int argc, char **argv) {
     fprintf(stderr, "Options:\n");
     fprintf(stderr, "  -d         : detail mode\n");
     fprintf(stderr, "  -h -?      : show this help\n");
+    fprintf(stderr, "  -v -V      : show version\n");
     fprintf(stderr, "  -u username: show data for a user (only for normal "
                     "mode. use * for all users)\n");
     fprintf(stderr, "\n");
@@ -79,6 +86,12 @@ int main(int argc, char **argv) {
     fprintf(stderr, " * slurmd\n");
     fprintf(stderr, " * reservations\n");
     exit(exit_code);
+  }
+
+  if (show_version ||
+      (optind + 1 == argc && strcmp(argv[optind], "version") == 0)) {
+    fprintf(stderr, "Version: %s\n", SLURMINFO_VERSION);
+    exit(0);
   }
 
   if (detail_mode) {

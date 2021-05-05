@@ -1,9 +1,9 @@
 #ifndef _SUMMARY_COMMON_HPP
 #define _SUMMARY_COMMON_HPP
 
-#include <vector>
-#include <string>
 #include "common.h"
+#include <string>
+#include <vector>
 
 std::vector<std::string> split(const std::string &str, const char *delimiter);
 
@@ -17,6 +17,5 @@ public:
 
   Tres(const std::string &tres_str);
 };
-
 
 #endif /* _SUMMARY_COMMON_HPP */

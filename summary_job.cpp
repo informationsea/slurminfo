@@ -101,7 +101,8 @@ void print_job_summary(FILE *file, job_info_msg_t *job_buffer_ptr,
   if (show_running_jobs) {
     print_job_vector_summary(
         file, show_username, running_jobs, "Running Jobs",
-        "     # Job ID          CPU   Memory  Partition Node      Running Time  "
+        "     # Job ID          CPU   Memory  Partition Node      Running Time "
+        " "
         "User "
         "       Name",
         [](FILE *file, slurm_job_info_t *jobinfo, const Tres &tres,

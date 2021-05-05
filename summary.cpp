@@ -54,7 +54,8 @@ void print_summary(FILE *file, const char *mode, const char *username) {
   }
 
   if (strcmp(mode, "all") == 0) {
-    print_node_summary(file, job_buffer_ptr, node_buffer_ptr, part_info_ptr, username);
+    print_node_summary(file, job_buffer_ptr, node_buffer_ptr, part_info_ptr,
+                       username);
     fprintf(file, "\n");
     print_job_summary(file, job_buffer_ptr, true, username);
     fprintf(file, "\n");
@@ -65,7 +66,8 @@ void print_summary(FILE *file, const char *mode, const char *username) {
   } else if (strcmp(mode, "jobs") == 0) {
     print_job_summary(file, job_buffer_ptr, true, username);
   } else if (strcmp(mode, "nodes") == 0) {
-    print_node_summary(file, job_buffer_ptr, node_buffer_ptr, part_info_ptr, username);
+    print_node_summary(file, job_buffer_ptr, node_buffer_ptr, part_info_ptr,
+                       username);
   } else if (strcmp(mode, "partitions") == 0) {
     print_partition_summary(file, job_buffer_ptr, node_buffer_ptr,
                             part_info_ptr);

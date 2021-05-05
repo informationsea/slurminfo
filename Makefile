@@ -87,14 +87,10 @@ DEPENDS = $(SRC:%.c=$(OBJDIR)/%.o.d) $(CXXSRC:%.cpp=$(OBJDIR)/%.o.d)
 all:exe
 
 exe:$(EXE)
-lib:$(LIB)
 
-$(EXE):$(OBJ) $(DEPEND_TARGET)
+$(EXE):version.h $(OBJ) $(DEPEND_TARGET)
 	$(LD) $(LDFLAGS) -o $@ $(OBJ) $(LIBS)
 	strip $@
-
-$(LIB):$(OBJ)
-	$(AR) $(ARFLAGS) $@ $(OBJ)
 
 $(OBJDIR)/%.o : %.c
 	$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
@@ -102,6 +98,12 @@ $(OBJDIR)/%.o : %.cpp
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
 $(OBJDIR)/%.res : %.rc
 	$(WINDRES) $< -O coff -o $@ $(RESFLAGS)
+
+version.h:
+	./makeversion.sh
+
+version.txt:
+	./makeversion.sh
 
 clean:
 	-rm $(OBJ)
