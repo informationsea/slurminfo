@@ -86,6 +86,20 @@ DEPENDS = $(SRC:%.c=$(OBJDIR)/%.o.d) $(CXXSRC:%.cpp=$(OBJDIR)/%.o.d)
 # Add target to build library
 all:exe
 
+zip:distfiles
+	zip -r slurminfo-`cat version.txt`.zip slurminfo-`cat version.txt`
+
+tar:distfiles
+	tar czf slurminfo-`cat version.txt`.tar.gz slurminfo-`cat version.txt`
+
+distfiles:exe version.txt
+	-rm -rf slurminfo-`cat version.txt`
+	mkdir -p slurminfo-`cat version.txt`
+	install -m 755 -d slurminfo-`cat version.txt`/bin
+	install -m 755 slurminfo slurminfo-`cat version.txt`/bin
+	install -m 644 README.md slurminfo-`cat version.txt`
+	install -m 644 LICENSE slurminfo-`cat version.txt`
+
 exe:$(EXE)
 
 $(EXE):version.h $(OBJ) $(DEPEND_TARGET)
@@ -112,6 +126,6 @@ clean:
 	-rm $(EXE)
 #   -rm -r $(OBJDIR)
 
-.PHONY:clean all exe lib
+.PHONY:clean all exe lib zip tar distfiles
 
 -include $(shell mkdir $(OBJDIR) 2>/dev/null) $(wildcard $(OBJDIR)/*.d)
