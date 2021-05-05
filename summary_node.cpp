@@ -75,7 +75,9 @@ void print_node_summary(FILE *file, job_info_msg_t *job_buffer_ptr,
           char total_mem_str[100];
           char alloc_mem_str[100];
           giga_memory(used_mem_str, sizeof(used_mem_str) - 1,
-                      node_tres.memory - node_info->free_mem);
+                      node_tres.memory > node_info->free_mem
+                          ? node_tres.memory - node_info->free_mem
+                          : 0);
           giga_memory(total_mem_str, sizeof(total_mem_str) - 1,
                       node_tres.memory);
           giga_memory(alloc_mem_str, sizeof(alloc_mem_str) - 1, alloc_mem);

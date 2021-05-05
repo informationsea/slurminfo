@@ -13,9 +13,6 @@
 #include "summary_common.hpp"
 #include "term.h"
 
-#define MIN(a, b) ((a) < (b) ? (a) : (b))
-#define MAX(a, b) ((a) < (b) ? (b) : (a))
-
 void print_partition_summary(FILE *file, job_info_msg_t *job_buffer_ptr,
                              node_info_msg_t *node_buffer_ptr,
                              partition_info_msg_t *part_info_ptr) {

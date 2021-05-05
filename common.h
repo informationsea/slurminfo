@@ -11,6 +11,9 @@
 extern "C" {
 #endif
 
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
+#define MAX(a, b) ((a) < (b) ? (b) : (a))
+
 void print_u32(FILE *file, uint32_t value, bool isEnd);
 void print_u64(FILE *file, uint64_t value, bool isEnd);
 void print_u16(FILE *file, uint16_t value, bool isEnd);
