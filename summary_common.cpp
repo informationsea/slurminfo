@@ -1,4 +1,9 @@
 #include "summary_common.hpp"
+#include <boost/algorithm/string/classification.hpp>
+#include <boost/algorithm/string/predicate.hpp>
+#include <boost/lexical_cast.hpp>
+#include <cstdint>
+#include <cstdio>
 
 std::vector<std::string> split(const std::string &str, const char *delimiter) {
   size_t next_search = 0;
@@ -14,6 +19,52 @@ std::vector<std::string> split(const std::string &str, const char *delimiter) {
   std::string one_partition_name = str.substr(next_search);
   result.push_back(one_partition_name);
   return result;
+}
+
+uint64_t parse_size(const std::string &str) {
+  if (str.empty()) {
+    return 0;
+  }
+  if (boost::ends_with(str, "K") || boost::ends_with(str, "k")) {
+    return (
+        uint64_t)(boost::lexical_cast<double>(str.substr(0, str.length() - 1)) *
+                  1024);
+  }
+  if (boost::ends_with(str, "M")) {
+    return (
+        uint64_t)(boost::lexical_cast<double>(str.substr(0, str.length() - 1)) *
+                  1024 * 1024);
+  }
+  if (boost::ends_with(str, "G")) {
+    return (
+        uint64_t)(boost::lexical_cast<double>(str.substr(0, str.length() - 1)) *
+                  1024 * 1024 * 1024);
+  }
+  if (boost::ends_with(str, "T")) {
+    return (
+        uint64_t)(boost::lexical_cast<double>(str.substr(0, str.length() - 1)) *
+                  1024 * 1024 * 1024 * 1024);
+  }
+  return boost::lexical_cast<uint64_t>(str);
+}
+
+std::string size_to_string(uint64_t size) {
+  char buf[100];
+  if (size > 1024LL * 1024LL * 1024LL * 1024LL) {
+    snprintf(buf, sizeof(buf) - 1, "%0.2fT",
+             ((double)size) / (1024LL * 1024LL * 1024LL * 1024LL));
+  } else if (size > 1024LL * 1024LL * 1024LL) {
+    snprintf(buf, sizeof(buf) - 1, "%0.2fG",
+             ((double)size) / (1024LL * 1024LL * 1024LL));
+  } else if (size > 1024LL * 1024LL) {
+    snprintf(buf, sizeof(buf) - 1, "%0.2fM",
+             ((double)size) / (1024LL * 1024LL));
+  } else if (size > 1024LL) {
+    snprintf(buf, sizeof(buf) - 1, "%0.2fk", ((double)size) / (1024LL));
+  } else {
+    snprintf(buf, sizeof(buf) - 1, "%0lu", size);
+  }
+  return std::string(buf);
 }
 
 Tres::Tres(const std::string &tres_str)

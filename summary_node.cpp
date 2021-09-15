@@ -26,6 +26,10 @@ void print_node_summary(FILE *file, job_info_msg_t *job_buffer_ptr,
   fprintf(file, "=================== Node List ===================\n");
   term_set_background_color(file, TERM_DEFAULT);
   term_set_foreground_color(file, TERM_DEFAULT);
+  fprintf(
+      file,
+      "  Node: [NAME]  State: [STATE]  Job: [# of running jobs]  Mem: "
+      "[Used]/[Allocated]/[Total]  CPU: [Allocated]/[Total]  Load:[LOAD]\n");
 
   for (size_t i = 0; i < job_buffer_ptr->record_count; i++) {
     slurm_job_info_t *job_ptr = &job_buffer_ptr->job_array[i];
@@ -82,17 +86,21 @@ void print_node_summary(FILE *file, job_info_msg_t *job_buffer_ptr,
                       node_tres.memory);
           giga_memory(alloc_mem_str, sizeof(alloc_mem_str) - 1, alloc_mem);
 
-          switch (node_info->node_state & NODE_STATE_BASE) {
-          case NODE_STATE_IDLE:
-            term_set_foreground_color(file, TERM_GREEN);
-            break;
-          case NODE_STATE_ALLOCATED:
-          case NODE_STATE_MIXED:
-            term_set_foreground_color(file, TERM_YELLOW);
-            break;
-          default:
+          if (node_info->node_state & NODE_STATE_DRAIN) {
             term_set_foreground_color(file, TERM_RED);
-            break;
+          } else {
+            switch (node_info->node_state & NODE_STATE_BASE) {
+            case NODE_STATE_IDLE:
+              term_set_foreground_color(file, TERM_GREEN);
+              break;
+            case NODE_STATE_ALLOCATED:
+            case NODE_STATE_MIXED:
+              term_set_foreground_color(file, TERM_YELLOW);
+              break;
+            default:
+              term_set_foreground_color(file, TERM_RED);
+              break;
+            }
           }
 
           fprintf(file,

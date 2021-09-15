@@ -31,6 +31,12 @@ const char *node_state(uint32_t state) {
 }
 
 const char *node_state_short(uint32_t state) {
+  if (state & NODE_STATE_MAINT) {
+    return "Mante";
+  }
+  if (state & NODE_STATE_DRAIN) {
+    return "Drain";
+  }
   switch (state & NODE_STATE_BASE) {
   case NODE_STATE_UNKNOWN:
     return "Unkwn";
@@ -90,7 +96,7 @@ void print_node_state(FILE *file, uint32_t state) {
   if (state & NODE_STATE_POWERING_DOWN) {
     fprintf(file, "PoweringDown,");
   }
-  fprintf(file, node_state(state));
+  fprintf(file, "%s", node_state(state));
 }
 
 void print_nodes(FILE *file) {

@@ -10,10 +10,10 @@ TARGET = slurminfo
 SRC = slurminfo.c nodes.c partitions.c common.c jobs.c slurmd.c reservations.c term.c spawn.c
 
 # CPP source code
-CXXSRC = summary.cpp summary_common.cpp summary_job.cpp summary_node.cpp summary_partitions.cpp summary_users.cpp
+CXXSRC = summary.cpp summary_common.cpp summary_job.cpp summary_node.cpp summary_partitions.cpp summary_users.cpp summary_account.cpp table.cpp
 
 # Common Flags
-CPPFLAGS += -Wall -Wextra -pipe -D_POSIX_C_SOURCE=200809
+CPPFLAGS += -Wall -Wextra -pipe -D_POSIX_C_SOURCE=200809 -Iincludes
 COMMON_FLAGS += 
 
 # C compiler
@@ -124,6 +124,8 @@ clean:
 	-rm $(DEPENDS)
 	-rmdir $(OBJDIR)
 	-rm $(EXE)
+	-rm version.h
+	-rm version.txt
 #   -rm -r $(OBJDIR)
 
 .PHONY:clean all exe lib zip tar distfiles

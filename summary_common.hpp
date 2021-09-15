@@ -2,10 +2,13 @@
 #define _SUMMARY_COMMON_HPP
 
 #include "common.h"
+#include <cstdint>
 #include <string>
 #include <vector>
 
 std::vector<std::string> split(const std::string &str, const char *delimiter);
+uint64_t parse_size(const std::string &str);
+std::string size_to_string(uint64_t size);
 
 class Tres {
 public:

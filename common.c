@@ -92,6 +92,22 @@ int sprint_duration_time(char *buf, size_t size, time_t target_time) {
   }
 }
 
+int sprint_diff_time(char *buf, size_t size, time_t diff) {
+  time_t sec = diff % 60;
+  diff /= 60;
+  time_t min = diff % 60;
+  diff /= 60;
+  time_t hour = diff % 24;
+  diff /= 24;
+  time_t day = diff;
+
+  if (day == 0) {
+    return snprintf(buf, size, "%02ld:%02ld:%02ld", hour, min, sec);
+  } else {
+    return snprintf(buf, size, "%ldd %02ld:%02ld:%02ld", day, hour, min, sec);
+  }
+}
+
 long string2long(const char *str, bool *ok) {
   char *endptr = NULL;
   long value = strtol(str, &endptr, 10);

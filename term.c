@@ -126,7 +126,7 @@ void term_set_reverse(FILE *file, bool enable) {
 
 pager_t auto_less() {
   if (isatty(STDOUT_FILENO)) {
-    char *args[] = {"less", "-R", "-F", NULL};
+    char *args[] = {"less", "-R", "-F", "-S", NULL};
     child_process_t process =
         spawn_pipe("/bin/less", args, SPAWN_PIPE_STDIN, false);
     if (process.pid < 0) {

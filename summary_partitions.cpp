@@ -37,12 +37,12 @@ void print_partition_summary(FILE *file, job_info_msg_t *job_buffer_ptr,
   }
 
   term_set_bold(file, true);
-  fprintf(file, "           Node        Total   Total  Executable Jobs(CPU)  "
+  fprintf(file, "            Node        Total   Total  Executable Jobs(CPU)  "
                 "Executable Jobs(Memory)   Executable Jobs(GPU)");
   term_set_bold(file, false);
   fprintf(file, "\n");
   term_set_bold(file, true);
-  fprintf(file, "Name       Avail Total   CPU   Mem(G) 1CPU 4CPU 8CPU 24CPU   "
+  fprintf(file, "Name        Avail Total   CPU   Mem(G) 1CPU 4CPU 8CPU 24CPU   "
                 "4G  16G  64G  80G 170G      1 board  8 board");
   term_set_bold(file, false);
   fprintf(file, "\n");
@@ -84,9 +84,12 @@ void print_partition_summary(FILE *file, job_info_msg_t *job_buffer_ptr,
         total_mem += node_tres.memory;
         total_gpu += node_tres.gpu;
 
-        if ((node_info->node_state & NODE_STATE_BASE) == NODE_STATE_IDLE ||
-            (node_info->node_state & NODE_STATE_BASE) == NODE_STATE_ALLOCATED ||
-            (node_info->node_state & NODE_STATE_BASE) == NODE_STATE_MIXED) {
+        if (((node_info->node_state & NODE_STATE_BASE) == NODE_STATE_IDLE ||
+             (node_info->node_state & NODE_STATE_BASE) ==
+                 NODE_STATE_ALLOCATED ||
+             (node_info->node_state & NODE_STATE_BASE) == NODE_STATE_MIXED) &&
+            !(node_info->node_state & NODE_STATE_DRAIN) &&
+            !(node_info->node_state & NODE_STATE_MAINT)) {
           up_nodes += 1;
 
           int alloc_cpu = 0;
@@ -128,7 +131,7 @@ void print_partition_summary(FILE *file, job_info_msg_t *job_buffer_ptr,
     }
 
     fprintf(file,
-            "%-10s  %4d  %4d  %4d %8lu %4d %4d %4d  %4d %4d %4d %4d %4d %4d    "
+            "%-11s  %4d  %4d  %4d %8lu %4d %4d %4d  %4d %4d %4d %4d %4d %4d    "
             "       %2d       %2d\n",
             info->name, up_nodes, info->total_nodes, info->total_cpus,
             total_mem / 1024, cpu_1core, cpu_4core, cpu_8core, cpu_24core,
