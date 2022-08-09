@@ -60,7 +60,8 @@ void print_node_summary(FILE *file, job_info_msg_t *job_buffer_ptr,
         }
 
         if ((node_info->node_state & NODE_STATE_BASE) == NODE_STATE_DOWN ||
-            (node_info->node_state & NODE_STATE_BASE) == NODE_STATE_ERROR) {
+            (node_info->node_state & NODE_STATE_BASE) == NODE_STATE_ERROR ||
+            (node_info->node_state & NODE_STATE_BASE) == NODE_STATE_UNKNOWN) {
           term_set_foreground_color(file, TERM_RED);
           fprintf(file, "  Node: %-8s  State: %s %s\n", node_info->name,
                   node_state_short(node_info->node_state), node_info->reason);
