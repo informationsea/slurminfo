@@ -6,3 +6,4 @@ version.h
 version.txt
 slurminfo-*
 /includes/
+.clangd

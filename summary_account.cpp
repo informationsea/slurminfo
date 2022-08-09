@@ -124,11 +124,11 @@ void print_job_account_summary(FILE *file, const char *job_id,
   }
   args[current_pos] = NULL;
 
-  fprintf(stderr, "$");
-  for (size_t i = 0; args[i] != NULL; i++) {
-    fprintf(stderr, " %s", args[i]);
-  }
-  fprintf(stderr, "\n");
+  // fprintf(stderr, "$");
+  // for (size_t i = 0; args[i] != NULL; i++) {
+  //   fprintf(stderr, " %s", args[i]);
+  // }
+  // fprintf(stderr, "\n");
 
   child_process_t process = spawn_pipe("sacct", args, SPAWN_PIPE_STDOUT, true);
   if (process.pid < 0) {
@@ -247,6 +247,10 @@ void print_job_account_summary(FILE *file, const char *job_id,
         exit(1);
       }
     }
+  }
+
+  if (current_job_result.job_id != "") {
+      job_results.push_back(current_job_result);
   }
 
   std::vector<std::vector<std::string>> table_data;

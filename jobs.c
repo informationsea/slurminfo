@@ -128,9 +128,6 @@ void print_job_flag(FILE *file, uint32_t flag) {
   if (flag & TEST_NOW_ONLY) {
     print_one(file, "TestImmediatelyStartOnly", &comma);
   }
-  if (flag & NODE_MEM_CALC) {
-    print_one(file, "NodeMemCalculated", &comma);
-  }
   if (flag & NODE_REBOOT) {
     print_one(file, "NodeRebootWating", &comma);
   }
@@ -197,8 +194,8 @@ void print_job_flag(FILE *file, uint32_t flag) {
   if (flag & JOB_DEPENDENT) {
     print_one(file, "JobDependent", &comma);
   }
-  if (flag & JOB_PROM) {
-    print_one(file, "PromscuousReservation", &comma);
+  if (flag & JOB_MAGNETIC) {
+    print_one(file, "JobMagnetic", &comma);
   }
 }
 

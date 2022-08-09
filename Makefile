@@ -13,7 +13,7 @@ SRC = slurminfo.c nodes.c partitions.c common.c jobs.c slurmd.c reservations.c t
 CXXSRC = summary.cpp summary_common.cpp summary_job.cpp summary_node.cpp summary_partitions.cpp summary_users.cpp summary_account.cpp table.cpp
 
 # Common Flags
-CPPFLAGS += -Wall -Wextra -pipe -D_POSIX_C_SOURCE=200809 -Iincludes
+CPPFLAGS += -Wall -Wextra -pipe -D_POSIX_C_SOURCE=200809 -Iincludes -I${INSTALLDIR_BOOST}/include
 COMMON_FLAGS += 
 
 # C compiler

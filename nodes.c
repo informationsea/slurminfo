@@ -75,8 +75,8 @@ void print_node_state(FILE *file, uint32_t state) {
   if (state & NODE_STATE_NO_RESPOND) {
     fprintf(file, "NoRespond,");
   }
-  if (state & NODE_STATE_POWER_SAVE) {
-    fprintf(file, "PowerSave,");
+  if (state & NODE_STATE_POWERED_DOWN) {
+    fprintf(file, "PowerDown,");
   }
   if (state & NODE_STATE_FAIL) {
     fprintf(file, "Fail,");
@@ -87,14 +87,35 @@ void print_node_state(FILE *file, uint32_t state) {
   if (state & NODE_STATE_MAINT) {
     fprintf(file, "Maintenance,");
   }
-  if (state & NODE_STATE_REBOOT) {
-    fprintf(file, "Reboot,");
+  if (state & NODE_STATE_REBOOT_REQUESTED) {
+    fprintf(file, "RebootRequested,");
   }
-  if (state & NODE_STATE_CANCEL_REBOOT) {
-    fprintf(file, "CancelReboot,");
+  if (state & NODE_STATE_REBOOT_CANCEL) {
+    fprintf(file, "RebootCancel,");
   }
   if (state & NODE_STATE_POWERING_DOWN) {
     fprintf(file, "PoweringDown,");
+  }
+  if (state & NODE_STATE_DYNAMIC) {
+    fprintf(file, "Dynamic,");
+  }
+  if (state & NODE_STATE_REBOOT_ISSUED) {
+    fprintf(file, "RebootIssued,");
+  }
+  if (state & NODE_STATE_PLANNED) {
+    fprintf(file, "Planned,");
+  }
+  if (state & NODE_STATE_INVALID_REG) {
+    fprintf(file, "InvalidReg,");
+  }
+  if (state & NODE_STATE_POWER_DOWN) {
+    fprintf(file, "PowerDown,");
+  }
+  if (state & NODE_STATE_POWER_UP) {
+    fprintf(file, "PowerUp,");
+  }
+  if (state & NODE_STATE_POWER_DRAIN) {
+    fprintf(file, "PowerDrain,");
   }
   fprintf(file, "%s", node_state(state));
 }

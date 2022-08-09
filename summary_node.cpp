@@ -2,6 +2,7 @@
 
 #include <map>
 #include <pwd.h>
+#include <slurm/slurm.h>
 #include <string.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -53,6 +54,10 @@ void print_node_summary(FILE *file, job_info_msg_t *job_buffer_ptr,
            index++) {
         node_info_t *node_info = &node_buffer_ptr->node_array[index];
         Tres node_tres = Tres(node_info->tres_fmt_str);
+
+        if ((node_info->node_state & NODE_STATE_BASE) == NODE_STATE_FUTURE) {
+          continue; // skip reserved nodes
+        }
 
         if ((node_info->node_state & NODE_STATE_BASE) == NODE_STATE_DOWN ||
             (node_info->node_state & NODE_STATE_BASE) == NODE_STATE_ERROR) {
