@@ -1,5 +1,6 @@
 #include "summary_users.hpp"
 
+#include <cstddef>
 #include <map>
 #include <pwd.h>
 #include <set>
@@ -92,15 +93,34 @@ void print_users_summary(FILE *file, job_info_msg_t *job_buffer_ptr) {
     }
   }
 
+  int maximum_length_of_username = 0;
+  for (auto one_user : users) {
+    struct passwd *pwd = getpwuid(one_user);
+    const char *username;
+    if (pwd) {
+      username = pwd->pw_name;
+    } else {
+      username = "<unknown>";
+    }
+    int l = (int)strnlen(username, 200);
+    if (l > maximum_length_of_username) {
+      maximum_length_of_username = l;
+    }
+  }
+
   term_set_bold(file, true);
-  fprintf(file, "                Running             Pending             "
-                "Blocked             Error");
+  fprintf(file,
+          "%-*s Running             Pending             "
+          "Blocked             Error",
+          maximum_length_of_username + 1, "");
   term_set_bold(file, false);
   fprintf(file, "\n");
 
   term_set_bold(file, true);
-  fprintf(file, "User            Jobs   CPU  MEM(G)  Jobs   CPU  MEM(G)  Jobs  "
-                " CPU  MEM(G)  Jobs   CPU  MEM(G)");
+  fprintf(file,
+          "%-*s Jobs   CPU  MEM(G)  Jobs   CPU  MEM(G)  Jobs  "
+          " CPU  MEM(G)  Jobs   CPU  MEM(G)",
+          maximum_length_of_username + 1, "User");
   term_set_bold(file, false);
   fprintf(file, "\n");
 
@@ -112,13 +132,15 @@ void print_users_summary(FILE *file, job_info_msg_t *job_buffer_ptr) {
     } else {
       username = "<unknown>";
     }
+
     fprintf(file,
-            "%-14s %5d %5d %7.1f %5d %5d %7.1f %5d %5d %7.1f %5d %5d %7.1f\n",
-            username, user_running_jobs[one_user], user_running_cpus[one_user],
-            user_running_mem[one_user] / 1024., user_pending_jobs[one_user],
-            user_pending_cpus[one_user], user_pending_mem[one_user] / 1024.,
-            user_blocked_jobs[one_user], user_blocked_cpus[one_user],
-            user_blocked_mem[one_user] / 1024., user_error_jobs[one_user],
-            user_error_cpus[one_user], user_error_mem[one_user] / 1024.);
+            "%-*s %5d %5d %7.1f %5d %5d %7.1f %5d %5d %7.1f %5d %5d %7.1f\n",
+            maximum_length_of_username, username, user_running_jobs[one_user],
+            user_running_cpus[one_user], user_running_mem[one_user] / 1024.,
+            user_pending_jobs[one_user], user_pending_cpus[one_user],
+            user_pending_mem[one_user] / 1024., user_blocked_jobs[one_user],
+            user_blocked_cpus[one_user], user_blocked_mem[one_user] / 1024.,
+            user_error_jobs[one_user], user_error_cpus[one_user],
+            user_error_mem[one_user] / 1024.);
   }
 }

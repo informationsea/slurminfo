@@ -32,12 +32,30 @@ void print_node_summary(FILE *file, job_info_msg_t *job_buffer_ptr,
       "  Node: [NAME]  State: [STATE]  Job: [# of running jobs]  Mem: "
       "[Used]/[Allocated]/[Total]  CPU: [Allocated]/[Total]  Load:[LOAD]\n");
 
+  int maximum_length_of_username = 0;
   for (size_t i = 0; i < job_buffer_ptr->record_count; i++) {
     slurm_job_info_t *job_ptr = &job_buffer_ptr->job_array[i];
     for (size_t j = 0; job_ptr->node_inx[j] >= 0; j += 2) {
       for (int32_t index = job_ptr->node_inx[j];
            index <= job_ptr->node_inx[j + 1]; index++) {
         node2jobs[index].push_back(job_ptr);
+      }
+    }
+
+    struct passwd *pwd = getpwuid(job_ptr->user_id);
+    const char *username;
+    if (pwd) {
+      username = pwd->pw_name;
+    } else {
+      username = "<unknown>";
+    }
+
+    if ((strcmp(show_username, username) == 0) ||
+        (strcmp(show_username, "*") == 0)) {
+
+      int l = (int)strnlen(username, 200);
+      if (l > maximum_length_of_username) {
+        maximum_length_of_username = l;
       }
     }
   }
@@ -153,10 +171,10 @@ void print_node_summary(FILE *file, job_info_msg_t *job_buffer_ptr,
                 }
                 fprintf(file,
                         "    Job: %-12s  CPU:%2d MEM:%5sG User: "
-                        "%-10s  Time: %-12s "
+                        "%-*s  Time: %-12s "
                         " Name: %s\n",
-                        job_id_buf, tres.cpu, mem, username, start_time,
-                        one_job->name);
+                        job_id_buf, tres.cpu, mem, maximum_length_of_username,
+                        username, start_time, one_job->name);
                 if (one_job->user_id == getuid()) {
                   term_set_underline(file, false);
                 }

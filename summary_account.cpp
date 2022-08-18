@@ -250,15 +250,16 @@ void print_job_account_summary(FILE *file, const char *job_id,
   }
 
   if (current_job_result.job_id != "") {
-      job_results.push_back(current_job_result);
+    job_results.push_back(current_job_result);
   }
 
   std::vector<std::vector<std::string>> table_data;
-  table_data.push_back({"Job ID", "Job Name", "State", "Partition", "User", "Submission",
-                        "Start", "End", "Elapsed time", "CPU", "CPU Time",
-                        "CPU %", "Sys CPU %", "Max Disk Read", "Max Disk Write",
-                        "Max RSS", "Max VMSize", "Alloc Mem", "RSS %",
-                        "VMSize %"});
+  table_data.push_back(
+      {"Job ID",       "Job Name",      "State",          "Partition",
+       "User",         "Submission",    "Start",          "End",
+       "Elapsed time", "CPU",           "CPU Time",       "CPU %",
+       "Sys CPU %",    "Max Disk Read", "Max Disk Write", "Max RSS",
+       "Max VMSize",   "Alloc Mem",     "RSS %",          "VMSize %"});
   for (auto one_job : job_results) {
     char elapsed_time[256];
     sprint_diff_time(elapsed_time, sizeof(elapsed_time) - 1,
@@ -305,27 +306,28 @@ void print_job_account_summary(FILE *file, const char *job_id,
     snprintf(vmem_ratio, sizeof(vmem_ratio) - 1, "%0.1f%%",
              ((double)max_vmem) / alloc_mem * 100);
 
-    table_data.push_back({one_job.job_id,
-                          one_job.job_name,
-                          one_job.state,
-                          one_job.partition,
-                          one_job.user,
-                          one_job.submit,
-                          one_job.start,
-                          one_job.end,
-                          elapsed_time,
-                          boost::lexical_cast<std::string>(one_job.alloc_cpus),
-                          cpu_time,
-                          cpu_ratio_str,
-                          sys_cpu_ratio_str,
-                          size_to_string(max_disk_read),
-                          size_to_string(max_disk_write),
-                          size_to_string(max_rss),
-                          size_to_string(max_vmem),
-                          size_to_string(alloc_mem),
-                          rss_ratio,
-                          vmem_ratio,
-      });
+    table_data.push_back({
+        one_job.job_id,
+        one_job.job_name,
+        one_job.state,
+        one_job.partition,
+        one_job.user,
+        one_job.submit,
+        one_job.start,
+        one_job.end,
+        elapsed_time,
+        boost::lexical_cast<std::string>(one_job.alloc_cpus),
+        cpu_time,
+        cpu_ratio_str,
+        sys_cpu_ratio_str,
+        size_to_string(max_disk_read),
+        size_to_string(max_disk_write),
+        size_to_string(max_rss),
+        size_to_string(max_vmem),
+        size_to_string(alloc_mem),
+        rss_ratio,
+        vmem_ratio,
+    });
   }
 
   print_table(file, table_data);

@@ -13,16 +13,22 @@
 #include "term.h"
 
 typedef std::function<void(
+    FILE *file, const int maximum_length_of_partition_name,
+    const int maximum_length_of_job_id, const int maximum_username_length)>
+    print_header_function_t;
+
+typedef std::function<void(
     FILE *file, slurm_job_info_t *jobinfo, const Tres &tres, size_t index,
-    const char *job_id, const char *mem, const char *username,
-    const char *start_duration, const char *submit_duration,
-    const char *state_reason)>
+    int maximum_length_of_partition_name, int maximum_length_of_job_id,
+    const char *job_id, const char *mem, const int maximum_username_length,
+    const char *username, const char *start_duration,
+    const char *submit_duration, const char *state_reason)>
     job_print_function_t;
 
 void print_job_vector_summary(FILE *file, const char *show_username,
                               const std::vector<slurm_job_info_t *> &jobs,
                               const std::string &list_name,
-                              const std::string &list_header,
+                              print_header_function_t header,
                               job_print_function_t job_print);
 
 void print_job_summary(FILE *file, job_info_msg_t *job_buffer_ptr,
@@ -101,76 +107,120 @@ void print_job_summary(FILE *file, job_info_msg_t *job_buffer_ptr,
   if (show_running_jobs) {
     print_job_vector_summary(
         file, show_username, running_jobs, "Running Jobs",
-        "     # Job ID          CPU   Memory  Partition Node      Running Time "
-        " "
-        "User "
-        "       Name",
+        [](FILE *file, const int maximum_length_of_partition_name,
+           const int maximum_length_of_job_id,
+           const int maximum_username_length) {
+          fprintf(file,
+                  "     # %-*s CPU   Memory  %-*s  Node    "
+                  "  Running Time  %-*s  Name",
+                  maximum_length_of_job_id, "Job ID",
+                  maximum_length_of_partition_name, "Partition",
+                  maximum_username_length, "User");
+        },
         [](FILE *file, slurm_job_info_t *jobinfo, const Tres &tres,
-           size_t index, const char *job_id, const char *mem,
-           const char *username, const char *start_duration,
-           const char * /*submit_duration*/, const char * /*state_reason*/) {
+           size_t index, int maximum_length_of_partition_name,
+           int maximum_length_of_job_id, const char *job_id, const char *mem,
+           const int maximum_username_length, const char *username,
+           const char *start_duration, const char * /*submit_duration*/,
+           const char * /*state_reason*/) {
           term_set_foreground_color(file, TERM_GREEN);
           fprintf(file, "R");
           term_set_foreground_color(file, TERM_DEFAULT);
-          fprintf(file, "%5lu %-16s %2u  %6sG  %-8s  %-8s  %12s  %-10s  %s",
-                  index, job_id, tres.cpu, mem, jobinfo->partition,
-                  jobinfo->nodes, start_duration, username, jobinfo->name);
+          fprintf(file, "%5lu %-*s %3u  %6sG  %-*s  %-8s %13s  %-*s  %s", index,
+                  maximum_length_of_job_id, job_id, tres.cpu, mem,
+                  maximum_length_of_partition_name, jobinfo->partition,
+                  jobinfo->nodes, start_duration, maximum_username_length,
+                  username, jobinfo->name);
         });
   }
 
   print_job_vector_summary(
       file, show_username, pending_jobs, "Pending Jobs",
-      "     # Job ID          CPU   Memory  Partition    Wait Time  User       "
-      "Reason                               Name",
-      [show_username](FILE *file, slurm_job_info_t *jobinfo, const Tres &tres,
-                      size_t index, const char *job_id, const char *mem,
-                      const char *username, const char * /*start_duration*/,
-                      const char *submit_duration, const char *state_reason) {
+      [](FILE *file, const int maximum_length_of_partition_name,
+         const int maximum_length_of_job_id,
+         const int maximum_username_length) {
+        fprintf(file,
+                "     # %-*s CPU   Memory  %-*s      Wait "
+                "Time  %-*s Reason                               Name",
+                maximum_length_of_job_id, "Job ID",
+                maximum_length_of_partition_name, "Partition",
+                maximum_username_length, "User");
+      },
+      [](FILE *file, slurm_job_info_t *jobinfo, const Tres &tres, size_t index,
+         int maximum_length_of_partition_name, int maximum_length_of_job_id,
+         const char *job_id, const char *mem, const int maximum_username_length,
+         const char *username, const char * /*start_duration*/,
+         const char *submit_duration, const char *state_reason) {
         term_set_foreground_color(file, TERM_YELLOW);
         fprintf(file, "P");
         term_set_foreground_color(file, TERM_DEFAULT);
-        fprintf(file, "%5lu %-16s %2u  %6sG  %-8s  %12s  %-10s %-35s  %s",
-                index, job_id, tres.cpu, mem, jobinfo->partition,
-                submit_duration, username, state_reason, jobinfo->name);
+        fprintf(file, "%5lu %-*s %3u  %6sG  %-*s  %13s  %-*s %-35s  %s", index,
+                maximum_length_of_job_id, job_id, tres.cpu, mem,
+                maximum_length_of_partition_name, jobinfo->partition,
+                submit_duration, maximum_username_length, username,
+                state_reason, jobinfo->name);
       });
   print_job_vector_summary(
       file, show_username, blocked_jobs, "Blocked Jobs",
-      "     # Job ID          CPU   Memory  Partition    Wait Time  User       "
-      "Reason                               Name",
+      [](FILE *file, const int maximum_length_of_partition_name,
+         const int maximum_length_of_job_id,
+         const int maximum_username_length) {
+        fprintf(file,
+                "     # %-*s CPU   Memory  %-*s      Wait Time  %-*s "
+                "Reason                               Name",
+                maximum_length_of_job_id, "Job ID",
+                maximum_length_of_partition_name, "Partition",
+                maximum_username_length, "User");
+      },
       [](FILE *file, slurm_job_info_t *jobinfo, const Tres &tres, size_t index,
-         const char *job_id, const char *mem, const char *username,
-         const char * /*start_duration*/, const char *submit_duration,
-         const char *state_reason) {
+         int maximum_length_of_partition_name, int maximum_length_of_job_id,
+         const char *job_id, const char *mem, const int maximum_username_length,
+         const char *username, const char * /*start_duration*/,
+         const char *submit_duration, const char *state_reason) {
         term_set_foreground_color(file, TERM_CYAN);
         fprintf(file, "B");
         term_set_foreground_color(file, TERM_DEFAULT);
 
-        fprintf(file, "%5lu %-16s %2u  %6sG  %-8s  %12s  %-10s %-35s  %s",
-                index, job_id, tres.cpu, mem, jobinfo->partition,
-                submit_duration, username, state_reason, jobinfo->name);
+        fprintf(file, "%5lu %-*s %3u  %6sG  %-*s  %13s  %-*s %-35s  %s", index,
+                maximum_length_of_job_id, job_id, tres.cpu, mem,
+                maximum_length_of_partition_name, jobinfo->partition,
+                submit_duration, maximum_username_length, username,
+                state_reason, jobinfo->name);
       });
   print_job_vector_summary(
       file, show_username, error_jobs, "Error Jobs",
-      "     # Job ID          CPU   Memory  Partition    Wait Time  User       "
-      "Reason                               Name",
+      [](FILE *file, const int maximum_length_of_partition_name,
+         const int maximum_length_of_job_id,
+         const int maximum_username_length) {
+        fprintf(file,
+                "     # %-*s CPU   Memory  %-*s      Wait "
+                "Time  %-*s "
+                "Reason                               Name",
+                maximum_length_of_job_id, "Job ID",
+                maximum_length_of_partition_name, "Partition",
+                maximum_username_length, "User");
+      },
       [](FILE *file, slurm_job_info_t *jobinfo, const Tres &tres, size_t index,
-         const char *job_id, const char *mem, const char *username,
-         const char * /*start_duration*/, const char *submit_duration,
-         const char *state_reason) {
+         int maximum_length_of_partition_name, int maximum_length_of_job_id,
+         const char *job_id, const char *mem, const int maximum_username_length,
+         const char *username, const char * /*start_duration*/,
+         const char *submit_duration, const char *state_reason) {
         term_set_foreground_color(file, TERM_RED);
         fprintf(file, "E");
         term_set_foreground_color(file, TERM_DEFAULT);
 
-        fprintf(file, "%5lu %-16s %2u  %6sG  %-8s  %12s  %-10s %-35s  %s",
-                index, job_id, tres.cpu, mem, jobinfo->partition,
-                submit_duration, username, state_reason, jobinfo->name);
+        fprintf(file, "%5lu %-*s %3u  %6sG  %-*s  %13s  %-*s %-35s  %s", index,
+                maximum_length_of_job_id, job_id, tres.cpu, mem,
+                maximum_length_of_partition_name, jobinfo->partition,
+                submit_duration, maximum_username_length, username,
+                state_reason, jobinfo->name);
       });
 }
 
 void print_job_vector_summary(FILE *file, const char *show_username,
                               const std::vector<slurm_job_info_t *> &jobs,
                               const std::string &list_name,
-                              const std::string &list_header,
+                              print_header_function_t list_header,
                               job_print_function_t job_print) {
   if (jobs.empty()) {
     return;
@@ -179,8 +229,46 @@ void print_job_vector_summary(FILE *file, const char *show_username,
   fprintf(file, " ----------------- %s ----------------- ", list_name.c_str());
   term_set_reverse(file, false);
   fprintf(file, "\n");
+
+  int maximum_length_of_username = (int)strlen("User ");
+  int maximum_length_of_partition_name = (int)strlen("Partition ");
+  int maximum_length_of_jobid = (int)strlen("Job ID ");
+
+  for (auto one_job : jobs) {
+    struct passwd *pwd = getpwuid(one_job->user_id);
+    const char *username;
+    if (pwd) {
+      username = pwd->pw_name;
+    } else {
+      username = "<unknown>";
+    }
+
+    if ((strcmp(show_username, username) == 0) ||
+        (strcmp(show_username, "*") == 0)) {
+
+      int l = (int)strnlen(username, 200);
+      if (l > maximum_length_of_username) {
+        maximum_length_of_username = l;
+      }
+
+      l = (int)strnlen(one_job->partition, 200);
+      if (l > maximum_length_of_partition_name) {
+        maximum_length_of_partition_name = l;
+      }
+
+      char job_id_buf[100];
+      memset(job_id_buf, 0, sizeof(job_id_buf));
+      job_id(job_id_buf, sizeof(job_id_buf) - 1, one_job);
+      l = (int)strnlen(job_id_buf, 100);
+      if (l > maximum_length_of_jobid) {
+        maximum_length_of_jobid = l;
+      }
+    }
+  }
+
   term_set_bold(file, true);
-  fprintf(file, "%s", list_header.c_str());
+  list_header(file, maximum_length_of_partition_name, maximum_length_of_jobid,
+              maximum_length_of_username);
   term_set_bold(file, false);
   fprintf(file, "\n");
 
@@ -190,7 +278,7 @@ void print_job_vector_summary(FILE *file, const char *show_username,
     char job_id_buf[100];
     memset(job_id_buf, 0, sizeof(job_id_buf));
     job_id(job_id_buf, sizeof(job_id_buf) - 1, *one_job);
-    char mem[6];
+    char mem[7];
     memset(mem, 0, sizeof(mem));
     giga_memory(mem, sizeof(mem) - 1, tres.memory);
     struct passwd *pwd = getpwuid((*one_job)->user_id);
@@ -230,8 +318,10 @@ void print_job_vector_summary(FILE *file, const char *show_username,
       if (getuid() == (*one_job)->user_id) {
         term_set_foreground_color(file, TERM_GREEN);
       }
-      job_print(file, *one_job, tres, index, job_id_buf, mem, username,
-                start_duration, submit_duration, reason);
+      job_print(file, *one_job, tres, index, maximum_length_of_partition_name,
+                maximum_length_of_jobid, job_id_buf, mem,
+                maximum_length_of_username, username, start_duration,
+                submit_duration, reason);
       if (getuid() == (*one_job)->user_id) {
         term_set_foreground_color(file, TERM_DEFAULT);
       }
