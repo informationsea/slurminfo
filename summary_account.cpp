@@ -85,7 +85,8 @@ double parse_time(const std::string &str) {
 }
 
 void print_job_account_summary(FILE *file, const char *job_id,
-                               const char *start_time, const char *end_time) {
+                               const char *show_user, const char *start_time,
+                               const char *end_time, const char *state) {
   int args_len = 5;
   if (job_id != NULL) {
     args_len += 2;
@@ -95,6 +96,16 @@ void print_job_account_summary(FILE *file, const char *job_id,
   }
   if (end_time != NULL) {
     args_len += 2;
+  }
+  if (state != NULL) {
+    args_len += 2;
+  }
+  if (show_user != NULL) {
+    if (strncmp(show_user, "*", 2) == 0) {
+      args_len += 1;
+    } else {
+      args_len += 2;
+    }
   }
 
   char **args = (char **)malloc(args_len * sizeof(char *));
@@ -121,6 +132,18 @@ void print_job_account_summary(FILE *file, const char *job_id,
   if (end_time != NULL) {
     args[current_pos++] = strdup("--endtime");
     args[current_pos++] = strdup(end_time);
+  }
+  if (state != NULL) {
+    args[current_pos++] = strdup("--state");
+    args[current_pos++] = strdup(state);
+  }
+  if (show_user != NULL) {
+    if (strncmp(show_user, "*", 2) == 0) {
+      args[current_pos++] = strdup("--allusers");
+    } else {
+      args[current_pos++] = strdup("--uid");
+      args[current_pos++] = strdup(show_user);
+    }
   }
   args[current_pos] = NULL;
 
@@ -232,7 +255,7 @@ void print_job_account_summary(FILE *file, const char *job_id,
       }
 
     } else if (job_id_elements.size() == 2 && job_id_elements[1] == "batch") {
-      current_job_result.exit_code = table.get("Exit Code", i);
+      current_job_result.exit_code = table.get("ExitCode", i);
       current_job_result.max_disk_read = table.get("MaxDiskRead", i);
       current_job_result.max_disk_write = table.get("MaxDiskWrite", i);
       current_job_result.max_rss = table.get("MaxRSS", i);
@@ -255,11 +278,12 @@ void print_job_account_summary(FILE *file, const char *job_id,
 
   std::vector<std::vector<std::string>> table_data;
   table_data.push_back(
-      {"Job ID",       "Job Name",      "State",          "Partition",
-       "User",         "Submission",    "Start",          "End",
-       "Elapsed time", "CPU",           "CPU Time",       "CPU %",
-       "Sys CPU %",    "Max Disk Read", "Max Disk Write", "Max RSS",
-       "Max VMSize",   "Alloc Mem",     "RSS %",          "VMSize %"});
+      {"Job ID",         "Job Name",   "State",        "Partition",
+       "User",           "Submission", "Start",        "End",
+       "Exit Code",      "Node List",  "Elapsed time", "CPU",
+       "CPU Time",       "CPU %",      "Sys CPU %",    "Max Disk Read",
+       "Max Disk Write", "Max RSS",    "Max VMSize",   "Alloc Mem",
+       "RSS %",          "VMSize %"});
   for (auto one_job : job_results) {
     char elapsed_time[256];
     sprint_diff_time(elapsed_time, sizeof(elapsed_time) - 1,
@@ -315,6 +339,8 @@ void print_job_account_summary(FILE *file, const char *job_id,
         one_job.submit,
         one_job.start,
         one_job.end,
+        one_job.exit_code,
+        one_job.node_list,
         elapsed_time,
         boost::lexical_cast<std::string>(one_job.alloc_cpus),
         cpu_time,

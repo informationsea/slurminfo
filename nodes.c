@@ -76,13 +76,13 @@ void print_node_state(FILE *file, uint32_t state) {
     fprintf(file, "NoRespond,");
   }
   if (state & NODE_STATE_POWERED_DOWN) {
-    fprintf(file, "PowerDown,");
+    fprintf(file, "PoweredDown,");
   }
   if (state & NODE_STATE_FAIL) {
     fprintf(file, "Fail,");
   }
-  if (state & NODE_STATE_POWER_UP) {
-    fprintf(file, "PowerUp,");
+  if (state & NODE_STATE_POWERING_UP) {
+    fprintf(file, "PoweringUp,");
   }
   if (state & NODE_STATE_MAINT) {
     fprintf(file, "Maintenance,");

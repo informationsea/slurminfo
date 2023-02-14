@@ -30,10 +30,11 @@ int main(int argc, char **argv) {
   const char *job_id = NULL;
   const char *start_time = NULL;
   const char *end_time = NULL;
+  const char *state = NULL;
   int exit_code = 0;
 
   int opt;
-  while ((opt = getopt(argc, argv, "j:s:e:h?du:avV")) != -1) {
+  while ((opt = getopt(argc, argv, "jS:s:E:h?du:avV")) != -1) {
     switch (opt) {
     case 'h':
     case '?':
@@ -48,14 +49,17 @@ int main(int argc, char **argv) {
     case 'j':
       job_id = optarg;
       break;
-    case 's':
+    case 'S':
       start_time = optarg;
       break;
-    case 'e':
+    case 'E':
       end_time = optarg;
       break;
     case 'a':
       show_user = "*";
+      break;
+    case 's':
+      state = optarg;
       break;
     case 'v':
     case 'V':
@@ -90,9 +94,11 @@ int main(int argc, char **argv) {
     fprintf(stderr, "  -u username   : show data for a user (only for normal "
                     "mode. use * for all users)\n");
     fprintf(stderr, "  -j job_id     : job ID (acct mode)\n");
-    fprintf(stderr, "  -s start_time : Select jobs in any state after the "
+    fprintf(stderr, "  -s state      : Selects jobs based on their state."
+                    " (acct mode)\n");
+    fprintf(stderr, "  -S start_time : Select jobs in any state after the "
                     "specified time. (acct mode)\n");
-    fprintf(stderr, "  -e end_time   : Select jobs in any state before the "
+    fprintf(stderr, "  -E end_time   : Select jobs in any state before the "
                     "specified time. (acct mode)\n");
     fprintf(stderr, "\n");
     fprintf(stderr, "Types in normal mode:\n");
@@ -121,7 +127,8 @@ int main(int argc, char **argv) {
 
   if (type != NULL && strcmp(type, "acct") == 0) {
     pager_t less = auto_less();
-    print_job_account_summary(less.out, job_id, start_time, end_time);
+    print_job_account_summary(less.out, job_id, show_user, start_time, end_time,
+                              state);
     close_pager(&less);
     return 0;
   }
