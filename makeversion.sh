@@ -4,7 +4,7 @@ set -eu -o pipefail
 
 source /etc/os-release
 
-VERSION_NUM=0.2.3
+VERSION_NUM=0.2.4
 GIT_HASH=$((git rev-parse HEAD||echo 'unknown')|head -c7)
 SLURM_VERSION=$(scontrol --version|sed -e 's/slurm //')
 OS_VERSION="${ID}-${VERSION_ID}"
