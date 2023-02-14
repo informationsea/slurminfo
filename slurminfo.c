@@ -34,7 +34,7 @@ int main(int argc, char **argv) {
   int exit_code = 0;
 
   int opt;
-  while ((opt = getopt(argc, argv, "jS:s:E:h?du:avV")) != -1) {
+  while ((opt = getopt(argc, argv, "j:S:s:E:h?du:avV")) != -1) {
     switch (opt) {
     case 'h':
     case '?':
