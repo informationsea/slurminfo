@@ -114,6 +114,12 @@ void print_node_summary(FILE *file, job_info_msg_t *job_buffer_ptr,
 
           if (node_info->node_state & NODE_STATE_DRAIN) {
             term_set_foreground_color(file, TERM_RED);
+          } else if (node_info->node_state & NODE_STATE_POWERED_DOWN) {
+            term_set_foreground_color(file, TERM_CYAN);
+          } else if (node_info->node_state & NODE_STATE_POWERING_DOWN) {
+            term_set_foreground_color(file, TERM_CYAN);
+          } else if (node_info->node_state & NODE_STATE_POWERING_UP) {
+            term_set_foreground_color(file, TERM_MAGENTA);
           } else {
             switch (node_info->node_state & NODE_STATE_BASE) {
             case NODE_STATE_IDLE:

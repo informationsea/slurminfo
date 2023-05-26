@@ -34,7 +34,7 @@ int main(int argc, char **argv) {
   int exit_code = 0;
 
   int opt;
-  while ((opt = getopt(argc, argv, "j:S:s:E:h?du:avV")) != -1) {
+  while ((opt = getopt(argc, argv, "j:S:s:e:E:h?du:avV")) != -1) {
     switch (opt) {
     case 'h':
     case '?':
@@ -52,6 +52,10 @@ int main(int argc, char **argv) {
     case 'S':
       start_time = optarg;
       break;
+    case 'e':
+      fprintf(stderr, "-e option was renamed to -E\n");
+      end_time = optarg;
+      break;
     case 'E':
       end_time = optarg;
       break;
@@ -59,7 +63,12 @@ int main(int argc, char **argv) {
       show_user = "*";
       break;
     case 's':
-      state = optarg;
+      if ('0' <= optarg[0] && optarg[0] <= '9') {
+        fprintf(stderr, "-s option was renamed to -S\n");
+        start_time = optarg;
+      } else {
+        state = optarg;
+      }
       break;
     case 'v':
     case 'V':

@@ -43,9 +43,21 @@ const char *node_state_short(uint32_t state) {
   case NODE_STATE_DOWN:
     return "Down ";
   case NODE_STATE_IDLE:
-    return "Idle ";
+    if (state & NODE_STATE_POWERED_DOWN) {
+      return "PwrSv";
+    } else if (state & NODE_STATE_POWERING_DOWN) {
+      return "PwrDw";
+    } else if (state & NODE_STATE_POWERING_UP) {
+      return "BtIdl";
+    } else {
+      return "Idle ";
+    }
   case NODE_STATE_ALLOCATED:
-    return "Alloc";
+    if (state & NODE_STATE_POWERING_UP) {
+      return "Boot ";
+    } else {
+      return "Alloc";
+    }
   case NODE_STATE_ERROR:
     return "Error";
   case NODE_STATE_MIXED:

@@ -42,6 +42,7 @@ void print_job_summary(FILE *file, job_info_msg_t *job_buffer_ptr,
   fprintf(file, "\n");
 
   std::vector<slurm_job_info_t *> running_jobs;
+  std::vector<slurm_job_info_t *> powerup_node_jobs;
   std::vector<slurm_job_info_t *> pending_jobs;
   std::vector<slurm_job_info_t *> blocked_jobs;
   std::vector<slurm_job_info_t *> error_jobs;
@@ -63,7 +64,11 @@ void print_job_summary(FILE *file, job_info_msg_t *job_buffer_ptr,
       }
       break;
     case JOB_RUNNING:
-      running_jobs.push_back(job_ptr);
+      if (job_ptr->job_state & JOB_POWER_UP_NODE) {
+        powerup_node_jobs.push_back(job_ptr);
+      } else {
+        running_jobs.push_back(job_ptr);
+      }
       break;
     case JOB_SUSPENDED:
     case JOB_PREEMPTED:
@@ -94,6 +99,11 @@ void print_job_summary(FILE *file, job_info_msg_t *job_buffer_ptr,
               return a->start_time < b->start_time;
             });
 
+  std::sort(powerup_node_jobs.begin(), powerup_node_jobs.end(),
+            [](slurm_job_info_t *a, slurm_job_info_t *b) {
+              return a->start_time < b->start_time;
+            });
+  
   std::sort(blocked_jobs.begin(), blocked_jobs.end(),
             [](slurm_job_info_t *a, slurm_job_info_t *b) {
               return a->submit_time < b->submit_time;
@@ -132,7 +142,36 @@ void print_job_summary(FILE *file, job_info_msg_t *job_buffer_ptr,
                   jobinfo->nodes, start_duration, maximum_username_length,
                   username, jobinfo->name);
         });
-  }
+
+    print_job_vector_summary(
+        file, show_username, powerup_node_jobs, "Assigned and booting node",
+        [](FILE *file, const int maximum_length_of_partition_name,
+           const int maximum_length_of_job_id,
+           const int maximum_username_length) {
+          fprintf(file,
+                  "     # %-*s CPU   Memory  %-*s  Node    "
+                  "  Running Time  %-*s  Name",
+                  maximum_length_of_job_id, "Job ID",
+                  maximum_length_of_partition_name, "Partition",
+                  maximum_username_length, "User");
+        },
+        [](FILE *file, slurm_job_info_t *jobinfo, const Tres &tres,
+           size_t index, int maximum_length_of_partition_name,
+           int maximum_length_of_job_id, const char *job_id, const char *mem,
+           const int maximum_username_length, const char *username,
+           const char *start_duration, const char * /*submit_duration*/,
+           const char * /*state_reason*/) {
+          term_set_foreground_color(file, TERM_MAGENTA);
+          fprintf(file, "U");
+          term_set_foreground_color(file, TERM_DEFAULT);
+          fprintf(file, "%5lu %-*s %3u  %6sG  %-*s  %-8s %13s  %-*s  %s", index,
+                  maximum_length_of_job_id, job_id, tres.cpu, mem,
+                  maximum_length_of_partition_name, jobinfo->partition,
+                  jobinfo->nodes, start_duration, maximum_username_length,
+                  username, jobinfo->name);
+        });
+
+    }
 
   print_job_vector_summary(
       file, show_username, pending_jobs, "Pending Jobs",
