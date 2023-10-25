@@ -7,7 +7,7 @@
 TARGET = slurminfo
 
 # C source code
-SRC = slurminfo.c nodes.c partitions.c common.c jobs.c slurmd.c reservations.c term.c spawn.c
+SRC = slurminfo.c nodes.c partitions.c common.c jobs.c slurmd.c reservations.c term.c spawn.c slurm_users.c
 
 # CPP source code
 CXXSRC = summary.cpp summary_common.cpp summary_job.cpp summary_node.cpp summary_partitions.cpp summary_users.cpp summary_account.cpp table.cpp

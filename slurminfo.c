@@ -21,6 +21,7 @@
 #include "summary_account.hpp"
 #include "term.h"
 #include "version.h"
+#include "slurm_users.h"
 
 int main(int argc, char **argv) {
   bool show_help = false;
@@ -153,6 +154,10 @@ int main(int argc, char **argv) {
       print_slurmd(stdout);
     } else if (strcmp(type, "reservations") == 0) {
       print_reservations(stdout);
+//    } else if (strcmp(type, "account") == 0) {
+//	char username[1024];
+//	get_username(username, sizeof(username));
+//	print_account_limit(username, stdout);
     } else {
       fprintf(stderr, "Unknown type: %s\n", type);
       exit(1);

@@ -68,7 +68,7 @@ std::string size_to_string(uint64_t size) {
 }
 
 Tres::Tres(const std::string &tres_str)
-    : cpu(1), memory(0), node(1), billing(1), gpu(0) {
+    : cpu(0), memory(0), node(1), billing(1), gpu(0) {
   auto entries = split(tres_str, ",");
   for (auto one_entry : entries) {
     if (one_entry.find("cpu=") == 0) {

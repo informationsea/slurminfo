@@ -103,7 +103,7 @@ void print_job_summary(FILE *file, job_info_msg_t *job_buffer_ptr,
             [](slurm_job_info_t *a, slurm_job_info_t *b) {
               return a->start_time < b->start_time;
             });
-  
+
   std::sort(blocked_jobs.begin(), blocked_jobs.end(),
             [](slurm_job_info_t *a, slurm_job_info_t *b) {
               return a->submit_time < b->submit_time;
@@ -170,8 +170,7 @@ void print_job_summary(FILE *file, job_info_msg_t *job_buffer_ptr,
                   jobinfo->nodes, start_duration, maximum_username_length,
                   username, jobinfo->name);
         });
-
-    }
+  }
 
   print_job_vector_summary(
       file, show_username, pending_jobs, "Pending Jobs",

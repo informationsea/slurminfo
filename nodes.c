@@ -175,10 +175,19 @@ void print_nodes(FILE *file) {
                 "TMP_DISK\t"
                 "WEIGHT\t"
                 "TRES\t"
+                "ALLOC_TRES\t"
                 "VERSION\n");
 
   for (size_t i = 0; i < node_buffer_ptr->record_count; i++) {
     node_info_t *info = &node_buffer_ptr->node_array[i];
+
+    char *node_alloc = NULL;
+    if (slurm_get_select_nodeinfo(info->select_nodeinfo,
+                                  SELECT_NODEDATA_TRES_ALLOC_FMT_STR,
+                                  NODE_STATE_ALLOCATED, &node_alloc) < 0) {
+      slurm_perror("Failed to load node info");
+    }
+
     fprintf(file, "%s\t", info->arch);
     fprintf(file, "%u\t", info->boards);
 
@@ -217,6 +226,7 @@ void print_nodes(FILE *file) {
     fprintf(file, "%u\t", info->tmp_disk);
     fprintf(file, "%u\t", info->weight);
     fprintf(file, "%s\t", info->tres_fmt_str);
+    fprintf(file, "%s\t", node_alloc);
     fprintf(file, "%s\n", info->version);
   }
 

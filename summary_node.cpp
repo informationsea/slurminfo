@@ -87,16 +87,22 @@ void print_node_summary(FILE *file, job_info_msg_t *job_buffer_ptr,
                   node_state_short(node_info->node_state), node_info->reason);
           term_set_foreground_color(file, TERM_DEFAULT);
         } else {
-          int alloc_cpu = 0;
-          int alloc_gpu = 0;
-          size_t alloc_mem = 0;
+          char *node_alloc_tres_fmt = NULL;
+          if (slurm_get_select_nodeinfo(node_info->select_nodeinfo,
+                                        SELECT_NODEDATA_TRES_ALLOC_FMT_STR,
+                                        NODE_STATE_ALLOCATED,
+                                        &node_alloc_tres_fmt) < 0) {
+            slurm_perror("Failed to load node info");
+          }
+          Tres alloc_node_tres =
+              node_alloc_tres_fmt ? Tres(node_alloc_tres_fmt) : Tres("");
+
+          int alloc_cpu = alloc_node_tres.cpu;
+          int alloc_gpu = alloc_node_tres.gpu;
+          size_t alloc_mem = alloc_node_tres.memory;
           int num_job = 0;
           for (auto one_job : node2jobs[index]) {
             if ((one_job->job_state & JOB_STATE_BASE) == JOB_RUNNING) {
-              auto tres = Tres(one_job->tres_alloc_str);
-              alloc_cpu += tres.cpu;
-              alloc_mem += tres.memory;
-              alloc_gpu += tres.gpu;
               num_job += 1;
             }
           }
