@@ -11,6 +11,7 @@
 #include <time.h>
 #include <unistd.h>
 
+#include "assoc.h"
 #include "common.h"
 #include "jobs.h"
 #include "nodes.h"
@@ -22,7 +23,8 @@
 #include "term.h"
 #include "version.h"
 
-int main(int argc, char **argv) {
+int main(int argc, char **argv)
+{
   bool show_help = false;
   bool show_version = false;
   bool detail_mode = false;
@@ -34,8 +36,10 @@ int main(int argc, char **argv) {
   int exit_code = 0;
 
   int opt;
-  while ((opt = getopt(argc, argv, "j:S:s:e:E:h?du:avV")) != -1) {
-    switch (opt) {
+  while ((opt = getopt(argc, argv, "j:S:s:e:E:h?du:avV")) != -1)
+  {
+    switch (opt)
+    {
     case 'h':
     case '?':
       show_help = true;
@@ -63,10 +67,13 @@ int main(int argc, char **argv) {
       show_user = "*";
       break;
     case 's':
-      if ('0' <= optarg[0] && optarg[0] <= '9') {
+      if ('0' <= optarg[0] && optarg[0] <= '9')
+      {
         fprintf(stderr, "-s option was renamed to -S\n");
         start_time = optarg;
-      } else {
+      }
+      else
+      {
         state = optarg;
       }
       break;
@@ -81,19 +88,22 @@ int main(int argc, char **argv) {
     }
   }
 
-  if ((optind >= argc && detail_mode)) {
+  if ((optind >= argc && detail_mode))
+  {
     show_help = true;
     exit_code = 1;
     fprintf(stderr, "ERROR: type is required in detail mode.\n\n");
   }
 
-  if (optind + 1 < argc) {
+  if (optind + 1 < argc)
+  {
     show_help = true;
     exit_code = 1;
     fprintf(stderr, "ERROR: Too many arguments.\n\n");
   }
 
-  if (show_help) {
+  if (show_help)
+  {
     fprintf(stderr, "Usage: slurminfo [-dh?] [type]\n\n");
     fprintf(stderr, "Options:\n");
     fprintf(stderr, "  -d            : detail mode\n");
@@ -123,18 +133,21 @@ int main(int argc, char **argv) {
     fprintf(stderr, " * nodes\n");
     fprintf(stderr, " * slurmd\n");
     fprintf(stderr, " * reservations\n");
+    fprintf(stderr, " * assoc\n");
     exit(exit_code);
   }
 
   if (show_version ||
-      (optind + 1 == argc && strcmp(argv[optind], "version") == 0)) {
+      (optind + 1 == argc && strcmp(argv[optind], "version") == 0))
+  {
     fprintf(stderr, "Version: %s\n", SLURMINFO_VERSION);
     exit(0);
   }
 
   const char *type = argv[optind];
 
-  if (type != NULL && strcmp(type, "acct") == 0) {
+  if (type != NULL && strcmp(type, "acct") == 0)
+  {
     pager_t less = auto_less();
     print_job_account_summary(less.out, job_id, show_user, start_time, end_time,
                               state);
@@ -142,40 +155,63 @@ int main(int argc, char **argv) {
     return 0;
   }
 
-  if (detail_mode) {
-    if (strcmp(type, "nodes") == 0) {
+  if (detail_mode)
+  {
+    if (strcmp(type, "nodes") == 0)
+    {
       print_nodes(stdout);
-    } else if (strcmp(type, "partitions") == 0) {
+    }
+    else if (strcmp(type, "partitions") == 0)
+    {
       print_partitions(stdout);
-    } else if (strcmp(type, "jobs") == 0) {
+    }
+    else if (strcmp(type, "jobs") == 0)
+    {
       print_jobs(stdout);
-    } else if (strcmp(type, "slurmd") == 0) {
+    }
+    else if (strcmp(type, "slurmd") == 0)
+    {
       print_slurmd(stdout);
-    } else if (strcmp(type, "reservations") == 0) {
+    }
+    else if (strcmp(type, "reservations") == 0)
+    {
       print_reservations(stdout);
-    } else {
+    }
+    else if (strcmp(type, "assoc") == 0)
+    {
+      print_assoc(stdout);
+    }
+    else
+    {
       fprintf(stderr, "Unknown type: %s\n", type);
       exit(1);
     }
-  } else {
+  }
+  else
+  {
     char buf[2000];
-    if (show_user == NULL) {
+    if (show_user == NULL)
+    {
       uid_t uid = getuid();
       struct passwd pwd_buf;
       struct passwd *pwd_result = NULL;
       getpwuid_r(uid, &pwd_buf, buf, sizeof(buf), &pwd_result);
-      if (pwd_result == NULL) {
+      if (pwd_result == NULL)
+      {
         perror("Failed to get current username");
         exit(1);
       }
       show_user = pwd_result->pw_name;
     }
 
-    if (type == NULL) {
+    if (type == NULL)
+    {
       pager_t less = auto_less();
       print_summary(less.out, "all", show_user);
       close_pager(&less);
-    } else {
+    }
+    else
+    {
       pager_t less = auto_less();
       print_summary(less.out, type, show_user);
       close_pager(&less);
